@@ -1,14 +1,14 @@
 import streamlit as st
 
 st.write("""
-##COBA APP
+#COBA APP
 Hello *World!*
 """)
 
 import requests
 import json
 import re
-# from IPython.display import Javascript
+from IPython.display import Javascript
 
 """dict dict = dictionary of dictionary {key:{key:value},key:{key:value}}
 
