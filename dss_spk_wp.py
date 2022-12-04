@@ -6,34 +6,18 @@
 # *   Rifqy Kurnia Sudarman
 
 import streamlit as st
+import pandas as pd
 import requests
 import json
 import re
 from IPython.display import Javascript
 
-st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
-
-tab1, tab2, tab3 = st.tabs(["Data Per Kecamatan", "Perhitungan", "Prioritas"])
-
-with tab1:
-  # Response request URL jadi dataframe
-  def loadData(url):
-    response =requests.get(url)
-    data = response.json()
-    st.dataframe(data, use_container_width=True)
-    # return data
-
-  # Ambil data dari API website
-  st.subheader('Data Penderita Penyakit')
-  sakit = loadData('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
-  st.subheader('Data Tenaga Kesehatan')
-  tenaga_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/614409705448f')
-  st.subheader('Data Sarana Kesehatan')
-  sarana_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/6143fd7241848')
-  st.subheader('Data Jumlah Penduduk')
-  penduduk = loadData('https://opendata.sumedangkab.go.id/index.php/api/61493671239d6')
-  st.subheader('Data Luas Daerah')
-  luas = loadData('https://opendata.sumedangkab.go.id/index.php/api/6149308d7471e')
+# Response request URL jadi dict list
+def loadData(url):
+  response =requests.get(url)
+  data = response.json()
+  st.dataframe(data, use_container_width=True)
+  return data
 
 # Ini fungsi-fungsi untuk ngumpulin data
 
@@ -81,37 +65,7 @@ def removeKey(target:dict,key):
 def formatKey(input):
   return re.sub('[^a-zA-Z ]+', '', input).rstrip().lstrip().upper()
 
-# Buat dict dict awal
-alts = {formatKey(alt['1']):{} for alt in sakit[1:-1]}
-print(alts)
-
-# Masukkan data-data yang dibutuhkan ke dictionary awal 
-ScrapColumnsFromList(alts,sakit[1:-1],'sakit','1',sumString,['4','5','6','7','8','9','10'])
-ScrapColumnsFromList(alts,tenaga_kesehatan[1:-1],'tenaga kesehatan','2',sumString,['1','2'],True)
-ScrapColumnsFromList(alts,sarana_kesehatan[1:-1],'sarana kesehatan','2',sumString,['1','2'],True)
-ScrapColumnsFromList(alts,penduduk[1:-1],'jumlah penduduk','1',sumString,['4'])
-ScrapColumnsFromList(alts,luas[1:-1],'luas','1',sumString,['3'])
-
-ScrapColumnsFromDict(alts,alts,'persentase sakit',lambda x : x[0]/x[1]*100,['sakit','jumlah penduduk'])
-ScrapColumnsFromDict(alts,alts,'persentase tenaga kesehatan',lambda x : x[0]/x[1]*100,['tenaga kesehatan','jumlah penduduk'])
-ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas'])
-
-ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
-
-# alts_lengkap = alts.copy()
-
-# Remove columns yang sudah tidak terpakai
-removeKey(alts,'sakit')
-removeKey(alts,'tenaga kesehatan')
-removeKey(alts,'jumlah penduduk')
-removeKey(alts,'sarana kesehatan')
-removeKey(alts,'luas')
-
-# Jadiin JSON
-alt_json = json.dumps(alts,indent=2)
-alt_json
-
-# Buat yang bentuknya sama kyk di website Sumedan
+# Buat yang bentuknya sama kyk di website Sumedang
 def dictDictToDictList(input:dict,key):
   output = []
   for k,v in input.items():
@@ -119,9 +73,6 @@ def dictDictToDictList(input:dict,key):
     row.update(v)
     output.append(row)
   return output
-
-alt_json = json.dumps(dictDictToDictList(alts,'kecamatan'),indent=2)
-alt_json
 
 # Ini fungsi WP
 def makeTableFromDictList(input:list,column_keys,is_column_keys_exception=False):
@@ -177,35 +128,72 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
   output.sort(key=lambda x:x['V'],reverse=True)
   return output
 
-# Jalanin WP nya
-weight_list = [1,-1,-1,1]
-excepted_columns = ['kecamatan']
-alts = json.loads(alt_json)
+st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 
-hasil_akhir = wp(alts,weight_list,excepted_columns,True)
+tab1, tab2, tab3 = st.tabs(["Data Per Kecamatan", "Perhitungan", "Prioritas"])
 
-# Jadiin JSON
-hasil_akhir_JSON = json.dumps(hasil_akhir,indent=2)
-hasil_akhir_JSON
+with tab1:
+  # Ambil data dari API website
+  st.subheader('Data Penderita Penyakit')
+  sakit = loadData('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
+  st.subheader('Data Tenaga Kesehatan')
+  tenaga_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/614409705448f')
+  st.subheader('Data Sarana Kesehatan')
+  sarana_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/6143fd7241848')
+  st.subheader('Data Jumlah Penduduk')
+  penduduk = loadData('https://opendata.sumedangkab.go.id/index.php/api/61493671239d6')
+  st.subheader('Data Luas Daerah')
+  luas = loadData('https://opendata.sumedangkab.go.id/index.php/api/6149308d7471e')
 
-# Jalanin WP nya
-weight_list = [1,-1,-1,1]
-excepted_columns = ['kecamatan']
-alts = json.loads(alt_json)
+  # Buat dict dict awal
+  alts = {formatKey(alt['1']):{} for alt in sakit[1:-1]}
 
-hasil_akhir = wp(alts,weight_list,excepted_columns,True)
+  # Masukkan data-data yang dibutuhkan ke dictionary awal
+  ScrapColumnsFromList(alts,sakit[1:-1],'sakit','1',sumString,['4','5','6','7','8','9','10'])
+  ScrapColumnsFromList(alts,tenaga_kesehatan[1:-1],'tenaga kesehatan','2',sumString,['1','2'],True)
+  ScrapColumnsFromList(alts,sarana_kesehatan[1:-1],'sarana kesehatan','2',sumString,['1','2'],True)
+  ScrapColumnsFromList(alts,penduduk[1:-1],'jumlah penduduk','1',sumString,['4'])
+  ScrapColumnsFromList(alts,luas[1:-1],'luas','1',sumString,['3'])
 
-# Jadiin JSON
-hasil_akhir_JSON = json.dumps(hasil_akhir,indent=2)
-hasil_akhir_JSON
+  dt = pd.DataFrame(
+    alts,
+    ScrapColumnsFromDict(alts,alts,'persentase sakit',lambda x : x[0]/x[1]*100,['sakit','jumlah penduduk']),
+    ScrapColumnsFromDict(alts,alts,'persentase tenaga kesehatan',lambda x : x[0]/x[1]*100,['tenaga kesehatan','jumlah penduduk']),
+    ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
+    ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
+  )
+  st.subheader('Data Awal')
+  st.dataframe(dt, use_container_width=True)
 
-# Jalanin WP nya (test untuk dataset lain)
-weight_list = [1,3,5]
-columns = ['4','5','6']
-alts = sakit[1:-1]
+  # alts_lengkap = alts.copy()
 
-hasil_akhir = wp(alts,weight_list,columns)
+  # Remove columns yang sudah tidak terpakai
+  removeKey(alts,'sakit')
+  removeKey(alts,'tenaga kesehatan')
+  removeKey(alts,'jumlah penduduk')
+  removeKey(alts,'sarana kesehatan')
+  removeKey(alts,'luas')
+  st.subheader('Data yang digunakan')
+  st.dataframe(alts, use_container_width=True)
 
-# Jadiin JSON
-hasil_akhir_JSON = json.dumps(hasil_akhir,indent=2)
-hasil_akhir_JSON
+with tab2:
+  alt_json = json.dumps(dictDictToDictList(alts,'kecamatan'),indent=2)
+
+with tab3:
+  # Jalanin WP nya
+  weight_list = [1,-1,-1,1]
+  excepted_columns = ['kecamatan']
+  alts = json.loads(alt_json)
+
+  hasil_akhir = wp(alts,weight_list,excepted_columns,True)
+  st.subheader('Hasil Akhir')
+  st.dataframe(hasil_akhir, use_container_width=True)
+
+  # Jalanin WP nya (test untuk dataset lain)
+  weight_list = [1,3,5]
+  columns = ['4','5','6']
+  alts = sakit[1:-1]
+
+  hasil_akhir = wp(alts,weight_list,columns)
+  st.subheader('Hasil (dataset lain)')
+  st.dataframe(hasil_akhir, use_container_width=True)
