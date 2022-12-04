@@ -1,11 +1,3 @@
-Anggota Kelompok:
-
-*   Adnan Rafiyansyah Majid
-*   Amalia Nur Fitri
-*   Muhammad Zidan Khairan
-*   Rifqy Kurnia Sudarman
-"""
-
 import streamlit as st
 
 st.write("""
