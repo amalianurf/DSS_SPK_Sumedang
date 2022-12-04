@@ -12,22 +12,30 @@ import json
 import re
 from IPython.display import Javascript
 
-st.title('Data Desa')
+st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 
-# Response request URL jadi dataframe
-def loadData(url):
-  response =requests.get(url)
-  data = response.json()
-  df = pd.DataFrame(data)
-  st.dataframe(df, use_container_width=True)
-  # return df
+tab1, tab2, tab3 = st.tabs(["Data Per Kecamatan", "Perhitungan", "Prioritas"])
 
-# Ambil data dari API website
-sakit = loadData('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
-tenaga_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/614409705448f')
-sarana_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/6143fd7241848')
-penduduk = loadData('https://opendata.sumedangkab.go.id/index.php/api/61493671239d6')
-luas = loadData('https://opendata.sumedangkab.go.id/index.php/api/6149308d7471e')
+with tab1:
+  # Response request URL jadi dataframe
+  def loadData(url):
+    response =requests.get(url)
+    data = response.json()
+    df = pd.DataFrame(data)
+    st.dataframe(df, use_container_width=True)
+    # return df
+
+  # Ambil data dari API website
+  st.subheader('Data Penderita Penyakit')
+  sakit = loadData('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
+  st.subheader('Data Tenaga Kesehatan')
+  tenaga_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/614409705448f')
+  st.subheader('Data Sarana Kesehatan')
+  sarana_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/6143fd7241848')
+  st.subheader('Data Jumlah Penduduk')
+  penduduk = loadData('https://opendata.sumedangkab.go.id/index.php/api/61493671239d6')
+  st.subheader('Data Luas Daerah')
+  luas = loadData('https://opendata.sumedangkab.go.id/index.php/api/6149308d7471e')
 
 # Ini fungsi-fungsi untuk ngumpulin data
 
