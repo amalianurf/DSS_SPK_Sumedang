@@ -1,34 +1,33 @@
+# Anggota Kelompok:
+
+# *   Adnan Rafiyansyah Majid
+# *   Amalia Nur Fitri
+# *   Muhammad Zidan Khairan
+# *   Rifqy Kurnia Sudarman
+
 import streamlit as st
-
-st.write("""
-#COBA APP
-Hello *World!*
-""")
-
+import pandas as pd
 import requests
 import json
 import re
 from IPython.display import Javascript
 
-"""dict dict = dictionary of dictionary {key:{key:value},key:{key:value}}
+st.title('Data Desa')
 
-dict list = list of dictionary [{key:value},{key:value}]
-"""
-
-# Response request URL jadi dict list
-def fetchJson(url):
-  print(url)
+# Response request URL jadi dataframe
+def loadData(url):
   response =requests.get(url)
   data = response.json()
-  print(data)
-  return data
+  df = pd.DataFrame(data)
+  st.dataframe(df, use_container_width=True)
+  # return df
 
 # Ambil data dari API website
-sakit = fetchJson('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
-tenaga_kesehatan = fetchJson('https://opendata.sumedangkab.go.id/index.php/api/614409705448f')
-sarana_kesehatan = fetchJson('https://opendata.sumedangkab.go.id/index.php/api/6143fd7241848')
-penduduk = fetchJson('https://opendata.sumedangkab.go.id/index.php/api/61493671239d6')
-luas = fetchJson('https://opendata.sumedangkab.go.id/index.php/api/6149308d7471e')
+sakit = loadData('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
+tenaga_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/614409705448f')
+sarana_kesehatan = loadData('https://opendata.sumedangkab.go.id/index.php/api/6143fd7241848')
+penduduk = loadData('https://opendata.sumedangkab.go.id/index.php/api/61493671239d6')
+luas = loadData('https://opendata.sumedangkab.go.id/index.php/api/6149308d7471e')
 
 # Ini fungsi-fungsi untuk ngumpulin data
 
