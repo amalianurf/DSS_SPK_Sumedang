@@ -10,7 +10,7 @@ import pandas as pd
 import requests
 import json
 import re
-from IPython.display import Javascript
+# from IPython.display import Javascript
 
 # Response request URL jadi dict list
 def loadData(url):
