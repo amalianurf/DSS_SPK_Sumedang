@@ -130,7 +130,7 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
 
 st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 
-tab1, tab2, tab3 = st.tabs(["Data Per Kecamatan", "Perhitungan", "Prioritas"])
+tab1, tab2 = st.tabs(["Data Per Kecamatan", "Perhitungan"])
 
 with tab1:
   # Ambil data dari API website
@@ -178,22 +178,15 @@ with tab1:
 
 with tab2:
   alt_json = json.dumps(dictDictToDictList(alts,'kecamatan'),indent=2)
+  c1 = st.number_input('Bobot Persentase Sakit')
+  c2 = st.number_input('Bobot Persentase Tenaga Kesehatan')
+  c3 = st.number_input('Bobot Sarana Kesehatan per Km')
+  c4 = st.number_input('Bobot Kepadatan Penduduk')
+  if st.button('Hitung'):
+    weight_list = [c1,c2,c3,c4]
+    excepted_columns = ['kecamatan']
+    alts = json.loads(alt_json)
 
-with tab3:
-  # Jalanin WP nya
-  weight_list = [1,-1,-1,1]
-  excepted_columns = ['kecamatan']
-  alts = json.loads(alt_json)
-
-  hasil_akhir = wp(alts,weight_list,excepted_columns,True)
-  st.subheader('Hasil Akhir')
-  st.dataframe(hasil_akhir, use_container_width=True)
-
-  # Jalanin WP nya (test untuk dataset lain)
-  weight_list = [1,3,5]
-  columns = ['4','5','6']
-  alts = sakit[1:-1]
-
-  hasil_akhir = wp(alts,weight_list,columns)
-  st.subheader('Hasil (dataset lain)')
-  st.dataframe(hasil_akhir, use_container_width=True)
+    hasil_akhir = wp(alts,weight_list,excepted_columns,True)
+    st.subheader('Hasil Akhir')
+    st.dataframe(hasil_akhir, use_container_width=True)
