@@ -6,7 +6,6 @@
 # *   Rifqy Kurnia Sudarman
 
 import streamlit as st
-import pandas as pd
 import requests
 import json
 import re
@@ -21,9 +20,8 @@ with tab1:
   def loadData(url):
     response =requests.get(url)
     data = response.json()
-    df = pd.DataFrame(data)
-    st.dataframe(df, use_container_width=True)
-    # return df
+    st.dataframe(data, use_container_width=True)
+    # return data
 
   # Ambil data dari API website
   st.subheader('Data Penderita Penyakit')
