@@ -5,6 +5,7 @@
 # *   Muhammad Zidan Khairan
 # *   Rifqy Kurnia Sudarman
 
+pip install IPython
 import streamlit as st
 import pandas as pd
 import requests
