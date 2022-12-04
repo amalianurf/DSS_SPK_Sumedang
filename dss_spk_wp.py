@@ -1,6 +1,6 @@
 # Anggota Kelompok:
 
-# *   Adnan Rafiyansyah Majid
+# *   Adnan Rafiyansyah Majidd
 # *   Amalia Nur Fitri
 # *   Muhammad Zidan Khairan
 # *   Rifqy Kurnia Sudarman
