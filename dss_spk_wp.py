@@ -135,6 +135,7 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
 
 
 st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
+st.subheader('Source Code  https://github.com/amalianurf/DSS_SPK_Sumedang')
 tab1, tab2 = st.tabs(["Data Per Kecamatan", "Perhitungan"])
 
 with tab1:
@@ -186,9 +187,9 @@ with tab1:
 
 with tab2:
   alt_json = json.dumps(alts,indent=2)
-  c1 = st.number_input('Bobot Persentase Sakit',value=3)
+  c1 = st.number_input('Bobot Persentase Orang yang Sakit',value=3)
   c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3)
-  c3 = st.number_input('Bobot Sarana Kesehatan per Km',value=2)
+  c3 = st.number_input('Bobot Sarana Kesehatan per Km2',value=2)
   c4 = st.number_input('Bobot Kepadatan Penduduk',value=1)
   if st.button('Hitung'):
     weight_list = [c1,c2*-1,c3*-1,c4]
