@@ -1,6 +1,6 @@
 # Anggota Kelompok:
 
-# *   Adnan Rafiyansyah Majidd
+# *   Adnan Rafiyansyah Majid
 # *   Amalia Nur Fitri
 # *   Muhammad Zidan Khairan
 # *   Rifqy Kurnia Sudarman
@@ -10,7 +10,6 @@ import pandas as pd
 import requests
 import json
 import re
-from IPython.display import Javascript
 
 # Response request URL jadi dict list
 def loadData(url):
@@ -74,13 +73,19 @@ def dictDictToDictList(input:dict,key):
     output.append(row)
   return output
 
-# Ini fungsi WP
+#ini fungsi-fungsi dict list
 def makeTableFromDictList(input:list,column_keys,is_column_keys_exception=False):
   alt_table = []
   for alt in input:
     alt_table.append(getDictValues(alt,column_keys,is_column_keys_exception))
   return alt_table
 
+def addPairsToDictListFromList(input:list,key,values:list):
+  for i in range(0,len(input)):
+    row = input[i]
+    row.update({key:values[i]})
+
+# Ini fungsi-fungsi WP
 def normalisasi(weight_list,func = lambda x:x):
   weight_total = 0
   normalised_list = []
@@ -109,11 +114,6 @@ def buatVektorS(alt_table,weight_list):
         si *= criteria
     s.append(si)
   return s
-
-def addPairsToDictListFromList(input:list,key,values:list):
-  for i in range(0,len(input)):
-    row = input[i]
-    row.update({key:values[i]})
 
 def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
   output = []
@@ -178,12 +178,12 @@ with tab1:
 
 with tab2:
   alt_json = json.dumps(dictDictToDictList(alts,'kecamatan'),indent=2)
-  c1 = st.number_input('Bobot Persentase Sakit')
-  c2 = st.number_input('Bobot Persentase Tenaga Kesehatan')
-  c3 = st.number_input('Bobot Sarana Kesehatan per Km')
-  c4 = st.number_input('Bobot Kepadatan Penduduk')
+  c1 = st.number_input('Bobot Persentase Sakit',value=3)
+  c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3)
+  c3 = st.number_input('Bobot Sarana Kesehatan per Km',value=2)
+  c4 = st.number_input('Bobot Kepadatan Penduduk',value=1)
   if st.button('Hitung'):
-    weight_list = [c1,c2,c3,c4]
+    weight_list = [c1,c2*-1,c3*-1,c4]
     excepted_columns = ['kecamatan']
     alts = json.loads(alt_json)
 
