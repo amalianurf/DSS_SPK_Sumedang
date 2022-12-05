@@ -190,4 +190,4 @@ with tab2:
     hasil_akhir = wp(alts,weight_list,excepted_columns,True)
     st.subheader('Hasil Akhir')
     st.dataframe(hasil_akhir, use_container_width=True)
-    st.bar_chart([pd.DataFrame(hasil_akhir,index='kecamatan',columns=['V'])])
+    st.bar_chart([pd.DataFrame(hasil_akhir,columns=['V'])])
