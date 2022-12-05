@@ -74,10 +74,15 @@ def dictDictToDictList(input:dict,key):
   return output
 
 #ini fungsi-fungsi dict list
-def makeTableFromDictList(input:list,column_keys,is_column_keys_exception=False):
+def getColumnsFromDictList(input:list,column_keys,is_column_keys_exception=False,func=None):
+  if func is None:
+    if len(column_keys) == 1 and is_column_keys_exception is False:
+      func = lambda x:x[0]
+    else:
+      func = lambda x:x
   alt_table = []
   for alt in input:
-    alt_table.append(getDictValues(alt,column_keys,is_column_keys_exception))
+    alt_table.append(func(getDictValues(alt,column_keys,is_column_keys_exception)))
   return alt_table
 
 def addPairsToDictListFromList(input:list,key,values:list):
@@ -120,7 +125,7 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
   for alt in alternatives:
     output.append(alt.copy())
 
-  alt_table = makeTableFromDictList(alternatives,criterias,is_criterias_exception)
+  alt_table = getColumnsFromDictList(alternatives,criterias,is_criterias_exception)
   weight_list = normalisasi(weight_list,abs)
   s = buatVektorS(alt_table,weight_list)
   v = normalisasi(s)
@@ -128,8 +133,8 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
   output.sort(key=lambda x:x['V'],reverse=True)
   return output
 
-st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 
+st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 tab1, tab2 = st.tabs(["Data Per Kecamatan", "Perhitungan"])
 
 with tab1:
@@ -155,17 +160,13 @@ with tab1:
   ScrapColumnsFromList(alts,penduduk[1:-1],'jumlah penduduk','1',sumString,['4'])
   ScrapColumnsFromList(alts,luas[1:-1],'luas','1',sumString,['3'])
 
-  dt = pd.DataFrame(
-    alts,
-    ScrapColumnsFromDict(alts,alts,'persentase sakit',lambda x : x[0]/x[1]*100,['sakit','jumlah penduduk']),
-    ScrapColumnsFromDict(alts,alts,'persentase tenaga kesehatan',lambda x : x[0]/x[1]*100,['tenaga kesehatan','jumlah penduduk']),
-    ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
-    ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
-  )
-  st.subheader('Data Awal')
-  st.dataframe(dt, use_container_width=True)
+  ScrapColumnsFromDict(alts,alts,'persentase sakit',lambda x : x[0]/x[1]*100,['sakit','jumlah penduduk']),
+  ScrapColumnsFromDict(alts,alts,'persentase tenaga kesehatan',lambda x : x[0]/x[1]*100,['tenaga kesehatan','jumlah penduduk']),
+  ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
+  ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
+  
 
-  # alts_lengkap = alts.copy()
+  alts_lengkap = alts.copy()
 
   # Remove columns yang sudah tidak terpakai
   removeKey(alts,'sakit')
@@ -173,11 +174,18 @@ with tab1:
   removeKey(alts,'jumlah penduduk')
   removeKey(alts,'sarana kesehatan')
   removeKey(alts,'luas')
+  
+  # ubah jadi bentuk seperti di web sumedang
+  alts = dictDictToDictList(alts,'kecamatan')
+  
+  st.subheader('Data Awal')
+  st.dataframe(dictDictToDictList(alts_lengkap,'kecamatan'), use_container_width=True)
+
   st.subheader('Data yang digunakan')
   st.dataframe(alts, use_container_width=True)
 
 with tab2:
-  alt_json = json.dumps(dictDictToDictList(alts,'kecamatan'),indent=2)
+  alt_json = json.dumps(alts,indent=2)
   c1 = st.number_input('Bobot Persentase Sakit',value=3)
   c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3)
   c3 = st.number_input('Bobot Sarana Kesehatan per Km',value=2)
@@ -190,4 +198,6 @@ with tab2:
     hasil_akhir = wp(alts,weight_list,excepted_columns,True)
     st.subheader('Hasil Akhir')
     st.dataframe(hasil_akhir, use_container_width=True)
-    st.bar_chart([pd.DataFrame(hasil_akhir,columns=['V'])])
+    dt = pd.DataFrame(hasil_akhir,index=getColumnsFromDictList(hasil_akhir,['kecamatan']),columns=['V'])
+    dt.sort_values(by=['V'],ascending=True)
+    st.bar_chart(dt,width=1,)
