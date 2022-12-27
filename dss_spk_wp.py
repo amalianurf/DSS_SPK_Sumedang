@@ -222,7 +222,7 @@ with tab2:
   c4 = st.number_input('Bobot Kepadatan Penduduk',value=1,min_value=0)
   
   # Jalankan perhitungan jika tombol hitung diklik
-  if st.button('Hitung'):
+  if st.button('Hitung dengan metode WP'):
     # Weight diubah sesuai apakah kriteria benefit atau cost
     weight_list = [c1,c2*-1,c3*-1,c4]
     # Kolom kecamatan bukan merupakan kriteria jadi tidak masuk perhitungan WP
