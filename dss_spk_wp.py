@@ -126,7 +126,6 @@ def buatVektorS(alt_table,weight_list):
     # alt = list yang berisi nilai-nilai kriteria sebuah alternatif
     alt = alt_table[i]
     for j in range(0,len(alt)):
-      criteria = int(alt[j])
       criteria = float(alt[j])
       # Handling jika nilai kriteria nol agar tidak ada pembagian oleh nol
       if criteria == 0:
@@ -137,6 +136,8 @@ def buatVektorS(alt_table,weight_list):
     s.append(si)
   return s
 
+# Fungsi wp (Cuma ini yang dipanggil oleh main program untuk mendapat nilai prioritas (V))
+# Return tabel alternatives + kolom V dan sudah di sort descending berdasarkan v
 def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
   output = []
 
@@ -144,21 +145,28 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
   for alt in alternatives:
     output.append(alt.copy())
 
+  # alt_table = list list berisi nilai-nilai kriteria semua alternatif
   alt_table = getColumnsFromDictList(alternatives,criterias,is_criterias_exception)
-  weight_list = normalisasi(weight_list,abs)
-  s = buatVektorS(alt_table,weight_list)
+  # normalised_weights berisi nilai-nilai weight absolut yang dinormalisasi
+  normalised_weights = normalisasi(weight_list,abs)
+  s = buatVektorS(alt_table,normalised_weights)
   v = normalisasi(s)
+  # Kolom V ditambahkan ke output, nilainya berdasarkan list/vektor v
   addPairsToDictListFromList(output,'V',v)
+  # output di sort descending berdasarkan nilai kolom V
   output.sort(key=lambda x:x['V'],reverse=True)
   return output
 
 
+# Ini Main program / Front end
+
 st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 st.subheader('Source Code  https://github.com/amalianurf/DSS_SPK_Sumedang')
+# Buat 2 tab
 tab1, tab2 = st.tabs(["Data Per Kecamatan", "Perhitungan"])
 
 with tab1:
-  # Ambil data dari API website
+  # Ambil data-data dari API website sumedang
   st.subheader('Data Penderita Penyakit')
   sakit = loadData('https://opendata.sumedangkab.go.id/index.php/api/61d3b33557f40')
   st.subheader('Data Tenaga Kesehatan')
@@ -185,38 +193,46 @@ with tab1:
   ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
   ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
   
-
+  # Tampilkan dictionary awal setelah dimasukkan data-data
   st.subheader('Data yang dikumpulkan')
   st.dataframe(dictDictToDictList(alts,'kecamatan'), use_container_width=True)
 
-  # Remove columns yang sudah tidak terpakai
+  # Remove columns yang tidak terpakai / sisakan kolom kriteria
   removeKey(alts,'sakit')
   removeKey(alts,'tenaga kesehatan')
   removeKey(alts,'jumlah penduduk')
   removeKey(alts,'sarana kesehatan')
   removeKey(alts,'luas')
   
-  # ubah jadi bentuk seperti di web sumedang
+  # Ubah jadi bentuk seperti di web sumedang JSON list (tipe data : string)
+  # Agar bisa didistribusikan
   alts = dictDictToDictList(alts,'kecamatan')
+  alt_json = json.dumps(alts,indent=2)
   
-
+  # Tampilkan dataset yang digunakan untuk perhitungan WP
   st.subheader('Data yang digunakan')
   st.dataframe(alts, use_container_width=True)
 
 with tab2:
-  alt_json = json.dumps(alts,indent=2)
+  # Interface untuk input weight
   c1 = st.number_input('Bobot Persentase Orang yang Sakit',value=3,min_value=0)
   c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3,min_value=0)
   c3 = st.number_input('Bobot Sarana Kesehatan per Km2',value=2,min_value=0)
   c4 = st.number_input('Bobot Kepadatan Penduduk',value=1,min_value=0)
   if st.button('Hitung'):
+    # Weight diubah sesuai apakah kriteria benefit atau cost
     weight_list = [c1,c2*-1,c3*-1,c4]
+    # Kolom kecamatan bukan merupakan kriteria jadi tidak masuk perhitungan WP
     excepted_columns = ['kecamatan']
+    # Data yang akan dipakai untuk perhitungan diambil dari string JSON list
     alts = json.loads(alt_json)
 
+    # Masukkan hasil perhitungan WP ke hasil_akhir
     hasil_akhir = wp(alts,weight_list,excepted_columns,True)
+
+    # Tampilkan hasil akhir
     st.subheader('Hasil Akhir')
     st.dataframe(hasil_akhir, use_container_width=True)
     dt = pd.DataFrame(hasil_akhir,index=getColumnsFromDictList(hasil_akhir,['kecamatan'],func = lambda x:x[0]),columns=['V'])
-    dt.sort_values(by=['V'],ascending=True)
+    # dt.sort_values(by=['V'],ascending=True)
     st.bar_chart(dt,width=1,)
