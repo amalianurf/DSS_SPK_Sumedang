@@ -192,7 +192,7 @@ with tab1:
   ScrapColumnsFromDict(alts,alts,'persentase sakit',lambda x : x[0]/x[1]*100,['sakit','jumlah penduduk']),
   ScrapColumnsFromDict(alts,alts,'persentase tenaga kesehatan',lambda x : x[0]/x[1]*100,['tenaga kesehatan','jumlah penduduk']),
   ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
-  ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
+  ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',column_keys=['7'])
   
   # Tampilkan dictionary awal setelah dimasukkan data-data
   st.subheader('Data yang dikumpulkan')
