@@ -162,6 +162,7 @@ def wp(alternatives:list,weight_list,criterias,is_criterias_exception=False):
 
 st.header('Meningkatkan pelayanan kesehatan berdasarkan jumlah penderita penyakit di daerah yang membutuhkan di Sumedang')
 st.subheader('Source Code  https://github.com/amalianurf/DSS_SPK_Sumedang')
+st.subheader('Jika error refresh saja karena kadang gagal mendapatkan data dari API')
 # Buat 2 tab
 tab1, tab2 = st.tabs(["Data Per Kecamatan", "Perhitungan"])
 
@@ -219,6 +220,8 @@ with tab2:
   c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3,min_value=0)
   c3 = st.number_input('Bobot Sarana Kesehatan per Km2',value=2,min_value=0)
   c4 = st.number_input('Bobot Kepadatan Penduduk',value=1,min_value=0)
+  
+  # Jalankan perhitungan jika tombol hitung diklik
   if st.button('Hitung'):
     # Weight diubah sesuai apakah kriteria benefit atau cost
     weight_list = [c1,c2*-1,c3*-1,c4]
@@ -234,5 +237,6 @@ with tab2:
     st.subheader('Hasil Akhir')
     st.dataframe(hasil_akhir, use_container_width=True)
     dt = pd.DataFrame(hasil_akhir,index=getColumnsFromDictList(hasil_akhir,['kecamatan'],func = lambda x:x[0]),columns=['V'])
-    # dt.sort_values(by=['V'],ascending=True)
+    
+    # Tampilkan hasil akhir dalam bentuk bar chart
     st.bar_chart(dt,width=1,)
