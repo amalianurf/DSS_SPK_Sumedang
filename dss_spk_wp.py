@@ -126,20 +126,14 @@ def buatVektorS(alt_table,weight_list):
     # alt = list yang berisi nilai-nilai kriteria sebuah alternatif
     alt = alt_table[i]
     for j in range(0,len(alt)):
-      try:
-        criteria = int(alt[j])
-      # Handling jika nilai kriteria desimal
-      except:
-        criteria = float(alt[j])
+      criteria = int(alt[j])
+      criteria = float(alt[j])
       # Handling jika nilai kriteria nol agar tidak ada pembagian oleh nol
       if criteria == 0:
         criteria = 1
       # weight = weight untuk sebuah kriteria
       weight = weight_list[j]
-      try:
-        si *= pow(criteria,weight)
-      except:
-        si *= criteria
+      si *= pow(criteria,weight)
     s.append(si)
   return s
 
