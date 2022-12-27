@@ -11,6 +11,10 @@ import requests
 import json
 import re
 
+# dict list = list berisi dictionary = [{key:value},{key:value}]
+# dict dict = dictionary berisi dictionary = {key:{key:value},key:{key:value}}
+# 
+
 # Response request URL jadi dict list
 def loadData(url):
   response =requests.get(url)
@@ -166,8 +170,9 @@ with tab1:
   ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
   ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
   
-
-  alts_lengkap = alts.copy()
+  
+  st.subheader('Data Awal')
+  st.dataframe(dictDictToDictList(alts,'kecamatan'), use_container_width=True)
 
   # Remove columns yang sudah tidak terpakai
   removeKey(alts,'sakit')
@@ -179,8 +184,6 @@ with tab1:
   # ubah jadi bentuk seperti di web sumedang
   alts = dictDictToDictList(alts,'kecamatan')
   
-  st.subheader('Data Awal')
-  st.dataframe(dictDictToDictList(alts_lengkap,'kecamatan'), use_container_width=True)
 
   st.subheader('Data yang digunakan')
   st.dataframe(alts, use_container_width=True)
