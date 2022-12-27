@@ -170,8 +170,8 @@ with tab1:
   ScrapColumnsFromDict(alts,alts,'sarana kesehatan per km',lambda x : x[0]/x[1],['sarana kesehatan','luas']),
   ScrapColumnsFromList(alts,penduduk[1:-1],'kepadatan penduduk','1',sumString,['7'])
   
-  
-  st.subheader('Data Awal')
+
+  st.subheader('Data yang dikumpulkan')
   st.dataframe(dictDictToDictList(alts,'kecamatan'), use_container_width=True)
 
   # Remove columns yang sudah tidak terpakai
@@ -190,10 +190,10 @@ with tab1:
 
 with tab2:
   alt_json = json.dumps(alts,indent=2)
-  c1 = st.number_input('Bobot Persentase Orang yang Sakit',value=3)
-  c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3)
-  c3 = st.number_input('Bobot Sarana Kesehatan per Km2',value=2)
-  c4 = st.number_input('Bobot Kepadatan Penduduk',value=1)
+  c1 = st.number_input('Bobot Persentase Orang yang Sakit',value=3,min_value=0)
+  c2 = st.number_input('Bobot Persentase Tenaga Kesehatan',value=3,min_value=0)
+  c3 = st.number_input('Bobot Sarana Kesehatan per Km2',value=2,min_value=0)
+  c4 = st.number_input('Bobot Kepadatan Penduduk',value=1,min_value=0)
   if st.button('Hitung'):
     weight_list = [c1,c2*-1,c3*-1,c4]
     excepted_columns = ['kecamatan']
